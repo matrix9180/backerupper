@@ -19,13 +19,16 @@ else
   msg="No backup has been recorded on this computer yet."
 fi
 
-# "Back up now" opens a terminal running backup.sh. --wait keeps notify-send
-# around until the notification is clicked or dismissed so we see the choice.
+# Clicking "Back up now" (or the notification itself, which GNOME reports as
+# the "default" action) opens a terminal running backup.sh. --wait keeps
+# notify-send around until the notification is clicked or dismissed.
 choice=$(notify-send --app-name=backerupper --icon=drive-removable-media \
-  --urgency=normal --wait --action=backup="Back up now" \
+  --urgency=normal --wait \
+  --action=default="Back up now" --action=backup="Back up now" \
   "Time to back up" "$msg Plug in and unlock the homebackup drive first.")
+echo "notification result: ${choice:-dismissed}"   # shows in journalctl --user -u backerupper-reminder
 
-if [[ $choice == backup ]]; then
+if [[ $choice == backup || $choice == default ]]; then
   ptyxis --new-window -T "Backup" -x \
     "bash -c '\"$HERE/backup.sh\"; echo; read -rp \"Press Enter to close…\"'"
 fi
