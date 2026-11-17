@@ -238,11 +238,14 @@ esac
 
 # ---------------------------------------------------------------- 5. finish
 step "Finishing up"
-mv "$WORK" "$SNAPS/$NAME"; WORK=''
+mv "$WORK" "$SNAPS/$NAME"; WORK=''; WORK_DONE=$SNAPS/$NAME
 ln -sfn "$NAME" "$SNAPS/latest"
 cp "$HERE/RESTORE.md" "$DEST/RESTORE.md"
-mkdir -p "$DEST/backerupper" && cp "$HERE"/{backup.sh,restore.sh,lib.sh,filters.txt,setup-drive.sh,RESTORE.md} "$DEST/backerupper/" 2>/dev/null || true
+mkdir -p "$DEST/backerupper" && cp "$HERE"/{backup.sh,restore.sh,lib.sh,filters.txt,setup-drive.sh,backup-reminder.sh,install-reminder.sh,RESTORE.md,README.md} "$DEST/backerupper/" 2>/dev/null || true
 ok "Snapshot saved as snapshots/$NAME (also: snapshots/latest)"
+# Remember locally when we last backed up, for backup-reminder.sh.
+STAMP=${XDG_STATE_HOME:-$HOME/.local/state}/backerupper/last-backup
+mkdir -p "$(dirname "$STAMP")" && cp "$WORK_DONE/system/last-backup.txt" "$STAMP" 2>/dev/null || true
 
 # A USB stick takes a while to absorb the page cache. Show how much is left
 # instead of a silent "sync".
